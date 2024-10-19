@@ -1,5 +1,5 @@
+import React, { useEffect, useRef, useState } from 'react';
 import { Pencil, Eraser, Square, Circle, Palette, Undo, Redo, ZoomIn, ZoomOut, Move } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 
 interface ToolBoxProps {
     tool: string;
@@ -13,81 +13,59 @@ interface ToolBoxProps {
     handleZoom: (direction: 'in' | 'out') => void;
 }
 
-const ToolBox = (
-    { tool, setTool, color, setColor, size, setSize, handleUndo, handleRedo, handleZoom }: ToolBoxProps
+const ToolBox: React.FC<ToolBoxProps> = (
+    { tool, setTool, color, setColor, size, setSize, handleUndo, handleRedo, handleZoom }
 ) => {
-
-    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [position, setPosition] = useState({ x: 20, y: 20 });
     const [dragging, setDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
-    const hasDragged = useRef(false);
-    const divRef = useRef<HTMLDivElement>(null);
+    const toolboxRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const initialX = window.innerWidth - 100;
-        const initialY = window.innerHeight - 100;
-        setPosition({ x: initialX, y: initialY });
-    }, []);
-
-    const handleStart = (clientX: number, clientY: number) => {
-        setDragging(true);
-        setOffset({
-            x: clientX - position.x,
-            y: clientY - position.y,
-        });
-        hasDragged.current = false;
-    };
-
-    const handleMove = (clientX: number, clientY: number) => {
-        if (dragging) {
-            setPosition({
-                x: clientX - offset.x,
-                y: clientY - offset.y,
-            });
-            hasDragged.current = true;
-        }
-    };
-
-    const handleEnd = () => {
-        setDragging(false);
-    };
-
-    const handleResize = () => {
-        const initialX = window.innerWidth - 100;
-        const initialY = window.innerHeight - 100;
-        setPosition({ x: initialX, y: initialY });
-    };
-
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
-        const handleTouchMove = (e: TouchEvent) => {
-            const touch = e.touches[0];
-            handleMove(touch.clientX, touch.clientY);
+        const handleMouseMove = (e: MouseEvent) => {
+            if (dragging) {
+                const newX = e.clientX - offset.x;
+                const newY = e.clientY - offset.y;
+                setPosition({ x: newX, y: newY });
+            }
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('touchmove', handleTouchMove);
-        window.addEventListener('mouseup', handleEnd);
-        window.addEventListener('touchend', handleEnd);
-        window.addEventListener('resize', handleResize);
+        const handleMouseUp = () => {
+            setDragging(false);
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
 
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('touchmove', handleTouchMove);
-            window.removeEventListener('mouseup', handleEnd);
-            window.removeEventListener('touchend', handleEnd);
-            window.removeEventListener('resize', handleResize);
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
         };
     }, [dragging, offset]);
 
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (toolboxRef.current && e.target === toolboxRef.current) {
+            setDragging(true);
+            setOffset({
+                x: e.clientX - position.x,
+                y: e.clientY - position.y,
+            });
+        }
+    };
+
     return (
-        <div ref={divRef}
-            onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
-            onTouchStart={(e) => {
-                const touch = e.touches[0];
-                handleStart(touch.clientX, touch.clientY);
+        <div
+            ref={toolboxRef}
+            style={{
+                position: 'fixed',
+                left: `${position.x}px`,
+                top: `${position.y}px`,
+                cursor: dragging ? 'grabbing' : 'grab',
+                userSelect: 'none',
             }}
-            className="fixed top-4 left-4 bg-white rounded-lg shadow-md p-4">
+            onMouseDown={handleMouseDown}
+            className="bg-white rounded-lg shadow-md p-4"
+        >
             <div className="flex space-x-4 mb-4">
                 <button
                     className={`p-2 rounded ${tool === 'pencil' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
@@ -152,7 +130,7 @@ const ToolBox = (
                 />
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default ToolBox
+export default ToolBox;
