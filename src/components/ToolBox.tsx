@@ -16,7 +16,7 @@ interface ToolBoxProps {
 const ToolBox: React.FC<ToolBoxProps> = (
     { tool, setTool, color, setColor, size, setSize, handleUndo, handleRedo, handleZoom }
 ) => {
-    const [position, setPosition] = useState({ x: 20, y: 20 });
+    const [position, setPosition] = useState({ x: 35, y: window.innerHeight / 2 });
     const [dragging, setDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
     const toolboxRef = useRef<HTMLDivElement>(null);
@@ -64,7 +64,7 @@ const ToolBox: React.FC<ToolBoxProps> = (
                 userSelect: 'none',
             }}
             onMouseDown={handleMouseDown}
-            className="bg-white rounded-lg shadow-md p-4"
+            className="bg-white rounded-lg shadow-md p-4 border"
         >
             <div className="flex space-x-4 mb-4">
                 <button
