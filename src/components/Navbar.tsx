@@ -25,7 +25,7 @@ export default function NavbarComp() {
           className="sm:hidden"
         />
         <NavbarBrand>
-          <p className="font-bold text-inherit">ACME</p>
+          <p className="font-bold text-inherit">All In One</p>
         </NavbarBrand>
       </NavbarContent>
 
