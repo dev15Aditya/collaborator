@@ -5,7 +5,6 @@ import Homepage from "./pages/Homepage"
 import Whiteboard from "./pages/Whiteboard"
 
 function App() {
-  
 
   return (
     <Router>
@@ -13,7 +12,9 @@ function App() {
       <NavbarComp />
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/whiteboard" element={<Whiteboard />} />
+        <Route path="/whiteboard/:roomId"
+          element={<Whiteboard />}
+        />
       </Routes>
       {/* <Homepage /> */}
 
