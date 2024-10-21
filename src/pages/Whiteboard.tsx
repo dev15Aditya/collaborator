@@ -28,13 +28,17 @@ const WhiteBoard: React.FC = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [lastPanPoint, setLastPanPoint] = useState<{ x: number; y: number } | null>(null);
 
-  const roomId = window.location.pathname.split('/').pop();
   useEffect(() => {
-    const newSocket = io('https://collaborator-be.onrender.com');
+    const newSocket = io('https://collaborator-be.onrender.com', {
+      transports: ['websocket'],
+      upgrade: false,
+    });
+    // const newSocket = io('https://collaborator-be.onrender.com');
     setSocket(newSocket);
-
+    
     newSocket.on('connect', () => {
       console.log("Connected to server");
+      const roomId = window.location.pathname.split('/').pop();
       // get room ID from URL params
       newSocket.emit('joinRoom', roomId);
     })
@@ -45,34 +49,36 @@ const WhiteBoard: React.FC = () => {
     });
 
     newSocket.on('drawAction', (action: DrawingAction) => {
-      setActions([...actions, action]);
+      setActions(prevActions => {
+        const newAction = [...prevActions, action]
+        redrawCanvas();
+        return newAction;
+      });
       redrawCanvas();
     })
 
     newSocket.on('undo', (actionId: string) => {
       setActions(prevActions => {
-        const actionIndex = prevActions.findIndex(action => action.id === actionId);
-        if(actionIndex === -1) {
-          const newActions = [...prevActions];
-          const [removedAction] = newActions.splice(actionIndex, 1);
-          setRedoActions(prevRedoActions => [...prevRedoActions, removedAction]);
-          return newActions;
-        }
-        return prevActions;
+        const newActions = prevActions.filter(action => action.id !== actionId);
+        redrawCanvas();
+        return newActions;
       });
-      redrawCanvas();
+      setRedoActions(prevRedoActions => [...prevRedoActions]);
     })
 
     newSocket.on('redo', (action: DrawingAction) => {
-      setActions(prevActions => [...prevActions, action]);
+      setActions(prevActions => {
+        const newActions = [...prevActions, action];
+        redrawCanvas();
+        return newActions;
+      });
       setRedoActions(prevRedoActions => prevRedoActions.filter(a => a.id !== action.id));
-      redrawCanvas();
     })
 
     return () => {
       newSocket.disconnect();
     }
-  }, [roomId]);
+  }, []);
 
 
   useEffect(() => {
@@ -103,6 +109,7 @@ const WhiteBoard: React.FC = () => {
     if (tool === 'pan') {
       setIsPanning(true);
       setLastPanPoint(getMousePos(e));
+      socket?.emit('startPan');
     } else {
       setIsDrawing(true);
       const point = getScaledMousePos(e);

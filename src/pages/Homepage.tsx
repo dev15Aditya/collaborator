@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+import generateUniqueId from "../utils/generateUniqueRoomID"
 
 const cardList = [
     { title: "Whiteboard", icon: "🖼️", link: '/whiteboard' },
@@ -15,20 +15,20 @@ const cardList = [
 
 
 const Homepage = () => {
-    const [roomID, setRoomID] = useState<string | null>(null);
-    const createRoom = async () => {
-        const response = await fetch('https://collaborator-be.onrender.com/create-room', { method: 'POST' })
-        const { roomId } = await response.json();
-        return roomId;
-    }
+    // const [roomID, setRoomID] = useState<string | null>(null);
+    // const createRoom = async () => {
+    //     const response = await fetch('https://collaborator-be.onrender.com/create-room', { method: 'POST' })
+    //     const { roomId } = await response.json();
+    //     return roomId;
+    // }
 
-    useEffect(() => {
-        createRoom().then(roomId => setRoomID(roomId))
-    }, [])
+    // useEffect(() => {
+    //     createRoom().then(roomId => setRoomID(roomId))
+    // }, [])
 
     const cardChip = (title: string, icon: string, index: number) => {
         return (
-            <Link key={index} to={title === 'Whiteboard' ? `/whiteboard/${roomID}` : title.replace(" ", "").toLowerCase()} className="bg-white border p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 hover:scale-105 transform flex flex-col items-center justify-center">
+            <Link key={index} to={title === 'Whiteboard' ? `/whiteboard/${generateUniqueId()}` : title.replace(" ", "").toLowerCase()} className="bg-white border p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 hover:scale-105 transform flex flex-col items-center justify-center">
                 <div className="text-4xl">{icon}</div>
                 <h3 className="text-lg font-semibold mt-3 text-gray-700">{title}</h3>
             </Link>
