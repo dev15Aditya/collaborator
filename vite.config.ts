@@ -1,7 +1,22 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  build: {
+    // Increase chunk size limit for tldraw
+    chunkSizeWarningLimit: 2000,
+    // Split chunks more aggressively
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('@tldraw')) {
+            return 'tldraw-vendor'
+          }
+          // Group react and related packages
+          if (id.includes('react')) {
+            return 'react-vendor'
+          }
+        }
+      }
+    }
+  }
 })
