@@ -1,7 +1,8 @@
 
 const Footer = () => {
+  const currPath = window.location.pathname.split('/')[1];
   return (
-    <footer className="py-4 poppins-light"
+    <footer className={`py-4 poppins-light ${currPath === 'whiteboard' ? 'hidden' : ''}`}
     // make transparent glass UI for footer
     style={{
       backgroundColor: "rgba(255, 255, 255, 0.8)",

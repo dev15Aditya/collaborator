@@ -15,16 +15,6 @@ const cardList = [
 
 
 const Homepage = () => {
-    // const [roomID, setRoomID] = useState<string | null>(null);
-    // const createRoom = async () => {
-    //     const response = await fetch('https://collaborator-be.onrender.com/create-room', { method: 'POST' })
-    //     const { roomId } = await response.json();
-    //     return roomId;
-    // }
-
-    // useEffect(() => {
-    //     createRoom().then(roomId => setRoomID(roomId))
-    // }, [])
 
     const cardChip = (title: string, icon: string, index: number) => {
         return (

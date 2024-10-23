@@ -3,6 +3,7 @@ import {Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, Navbar
 
 export default function NavbarComp() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const currPath = window.location.pathname.split('/')[1];
 
   const menuItems = [
     "Profile",
@@ -18,7 +19,7 @@ export default function NavbarComp() {
   ];
 
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen}>
+    <Navbar onMenuOpenChange={setIsMenuOpen} className={`${currPath === 'whiteboard' ? 'hidden' : ''}`}>
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
